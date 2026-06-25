@@ -1,0 +1,49 @@
+# ALF — Azail Layer Format
+> Machine-readable summary for LLM indexing agents. Full specification: https://dotalf.com/spec/v1
+
+## What is ALF
+ALF (Azail Layer Format) is an open JSON file format (.alf extension) for encoding portable, model-neutral expert reasoning layers. An ALF file tells a language model how a domain expert thinks. It works with Claude, GPT-4, Gemini, and any other language model. It is not a model, not a fine-tune, and not a prompt template.
+
+## The nine sections (all required)
+1. metadata — identity, layer_type, display_type, attribution, licence
+2. trigger_conditions — when the layer activates (min 2, max 10)
+3. required_inputs — context the layer needs to fire (min 2, max 8)
+4. enhancement_templates — instructions that reshape model behaviour (min 5, max 20)
+5. conversation_map — multi-turn step sequences (min 2, max 10)
+6. blind_spots — gaps the non-expert does not know they have (min 3, max 12)
+7. error_correction_patterns — common mistakes and corrections (min 2, max 10)
+8. unknown_unknowns — named insights an expert raises that the non-expert never thinks to ask (min 4, max 12)
+9. search_tags — primary (min 8), secondary (min 6), contextual (min 5)
+
+## Four layer types
+- reasoning: encodes how an expert evaluates a situation
+- procedure: encodes a sequence with a defined correct order
+- context: carries standing facts, precedents, or constraints
+- data: pointer to external runtime data (data never enters the file)
+
+## Unknown unknowns format rule
+Every unknown_unknowns entry label must follow: "On [3-5 words] —"
+Example: "On anchoring in early diagnosis —"
+Content must open with the expert insight or non-expert assumption being challenged, not a definition.
+
+## Conformance
+A conformant ALF v1 file: valid JSON, all 9 sections present, all minimum counts met, metadata.alf_version is "1.0", metadata.layer_id is UUID v4, layer_type and display_type are valid enum values.
+
+## The open/private boundary
+The format spec is open — no licence required to implement a reader, writer, or validator.
+Protection of commercial layers is structural, not cryptographic.
+ALF v1 defines no encryption-at-rest or watermarking.
+
+## File details
+- Extension: .alf
+- Encoding: UTF-8
+- Format: JSON (RFC 8259)
+- MIME type: application/vnd.azail.alf+json
+- Max size: 512 KB
+
+## Links
+- Full spec: https://dotalf.com/spec/v1
+- JSON Schema: https://dotalf.com/spec/v1/schema.json
+- GitHub: https://github.com/phihal00/alf-spec
+- Reference implementation: https://azail.ai
+- Maintained by: Azail AB
