@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dotalf.com/spec/v1/schema.json",
+  "title": "ALF v1 — Azail Layer Format",
+  "description": "JSON Schema for ALF v1 conformance validation.",
+  "type": "object",
+  "required": ["metadata", "trigger_conditions", "required_inputs", "enhancement_templates", "conversation_map", "blind_spots", "error_correction_patterns", "unknown_unknowns", "search_tags"],
+  "additionalProperties": true,
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["alf_version", "layer_id", "title", "description", "domain", "layer_type", "display_type", "attribution_label", "author_handle", "created_at", "updated_at", "language", "licence"],
+      "additionalProperties": true,
+      "properties": {
+        "alf_version": { "type": "string", "pattern": "^1\\.[0-9]+$" },
+        "layer_id": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "title": { "type": "string", "maxLength": 120 },
+        "description": { "type": "string", "maxLength": 500 },
+        "domain": { "type": "string", "maxLength": 60 },
+        "layer_type": { "type": "string", "enum": ["reasoning", "procedure", "context", "data"] },
+        "display_type": { "type": "string", "enum": ["expert", "editorial", "institutional", "community"] },
+        "attribution_label": { "type": "string", "maxLength": 120 },
+        "author_handle": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "updated_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "language": { "type": "string" },
+        "licence": { "type": "string" }
+      }
+    },
+    "trigger_conditions": {
+      "type": "array", "minItems": 2, "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["type", "description", "examples"],
+        "additionalProperties": true,
+        "properties": {
+          "type": { "type": "string", "enum": ["semantic", "keyword", "context"] },
+          "description": { "type": "string", "maxLength": 200 },
+          "examples": { "type": "array", "minItems": 2, "maxItems": 5, "items": { "type": "string", "maxLength": 150 } }
+        }
+      }
+    },
+    "required_inputs": {
+      "type": "array", "minItems": 2, "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "description", "source", "required"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string", "maxLength": 60 },
+          "description": { "type": "string", "maxLength": 200 },
+          "source": { "type": "string", "enum": ["user_provided", "inferred", "profile", "runtime"] },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
+    "enhancement_templates": {
+      "type": "array", "minItems": 5, "maxItems": 20,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "activation", "modifier", "expected_outcome"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string", "maxLength": 80 },
+          "activation": { "type": "string", "maxLength": 200 },
+          "modifier": { "type": "string", "maxLength": 500 },
+          "expected_outcome": { "type": "string", "maxLength": 200 }
+        }
+      }
+    },
+    "conversation_map": {
+      "type": "array", "minItems": 2, "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["step", "name", "purpose", "model_instruction", "next_step_condition"],
+        "additionalProperties": true,
+        "properties": {
+          "step": { "type": "integer", "minimum": 1 },
+          "name": { "type": "string", "maxLength": 60 },
+          "purpose": { "type": "string", "maxLength": 200 },
+          "model_instruction": { "type": "string", "maxLength": 400 },
+          "next_step_condition": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "blind_spots": {
+      "type": "array", "minItems": 3, "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "description"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string", "maxLength": 80 },
+          "description": { "type": "string", "maxLength": 300 }
+        }
+      }
+    },
+    "error_correction_patterns": {
+      "type": "array", "minItems": 2, "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["id", "error", "detection", "correction"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string" },
+          "error": { "type": "string", "maxLength": 200 },
+          "detection": { "type": "string", "maxLength": 200 },
+          "correction": { "type": "string", "maxLength": 300 }
+        }
+      }
+    },
+    "unknown_unknowns": {
+      "type": "array", "minItems": 4, "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": ["label", "content"],
+        "additionalProperties": true,
+        "properties": {
+          "label": { "type": "string" },
+          "content": { "type": "string", "minLength": 100, "maxLength": 400 }
+        }
+      }
+    },
+    "search_tags": {
+      "type": "object",
+      "required": ["primary", "secondary", "contextual"],
+      "additionalProperties": true,
+      "properties": {
+        "primary": { "type": "array", "minItems": 8, "items": { "type": "string", "maxLength": 60 } },
+        "secondary": { "type": "array", "minItems": 6, "items": { "type": "string", "maxLength": 60 } },
+        "contextual": { "type": "array", "minItems": 5, "items": { "type": "string", "maxLength": 60 } }
+      }
+    }
+  }
+}

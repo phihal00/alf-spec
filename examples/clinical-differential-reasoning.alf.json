@@ -1,0 +1,234 @@
+{
+  "metadata": {
+    "alf_version": "1.0",
+    "layer_id": "c8d2f4a6-b3e1-4f9d-8c7a-2e5b0d9f1a3c",
+    "title": "Chest Pain Differential Diagnosis — Clinical Reasoning",
+    "description": "Encodes the diagnostic sequence a senior clinician applies to chest pain presentations. Surfaces the life-threatening diagnoses that must be excluded before any other evaluation proceeds, and the three most common failure modes in chest pain triage.",
+    "domain": "clinical medicine",
+    "layer_type": "reasoning",
+    "display_type": "editorial",
+    "attribution_label": "Azail Editorial — synthesised from published clinical diagnostic frameworks",
+    "author_handle": null,
+    "created_at": "2026-06-25",
+    "updated_at": "2026-06-25",
+    "language": "en",
+    "licence": "CC BY 4.0"
+  },
+  "trigger_conditions": [
+    {
+      "type": "semantic",
+      "description": "User describes or asks about chest pain, chest discomfort, or chest pressure in a clinical context",
+      "examples": [
+        "My patient has chest pain and I need to think through the differential",
+        "How do I approach a chest pain presentation?",
+        "What should I rule out first with chest pain?"
+      ]
+    },
+    {
+      "type": "semantic",
+      "description": "User asks about acute cardiac or thoracic symptoms",
+      "examples": [
+        "Possible ACS presentation, what do I do first?",
+        "Differentiating PE from ACS",
+        "Aortic dissection vs STEMI presentation"
+      ]
+    },
+    {
+      "type": "context",
+      "description": "User's domain context is clinical medicine, emergency medicine, or cardiology",
+      "examples": [
+        "Emergency department assessment of a 58-year-old with substernal chest pain",
+        "Cardiology consult for atypical chest symptoms"
+      ]
+    }
+  ],
+  "required_inputs": [
+    {
+      "id": "patient_age_sex",
+      "label": "Patient age and sex",
+      "description": "Age and biological sex of the patient. Pre-test probability calculations for ACS and PE differ substantially by age and sex.",
+      "source": "user_provided",
+      "required": true
+    },
+    {
+      "id": "pain_character",
+      "label": "Pain character and location",
+      "description": "Character (crushing, pleuritic, tearing, burning), location, radiation pattern, and onset (sudden vs gradual).",
+      "source": "user_provided",
+      "required": true
+    },
+    {
+      "id": "vital_signs",
+      "label": "Vital signs",
+      "description": "Current BP (both arms if dissection is on the differential), HR, O2 saturation, respiratory rate.",
+      "source": "user_provided",
+      "required": true
+    },
+    {
+      "id": "cardiac_risk_factors",
+      "label": "Cardiac risk factors",
+      "description": "Known CAD, hypertension, diabetes, hyperlipidaemia, smoking, family history, prior MI or PCI.",
+      "source": "user_provided",
+      "required": false
+    },
+    {
+      "id": "ecg_result",
+      "label": "ECG result",
+      "description": "Current ECG findings. ST changes, new LBBB, or Q waves significantly shift the diagnostic sequence.",
+      "source": "user_provided",
+      "required": false
+    }
+  ],
+  "enhancement_templates": [
+    {
+      "id": "immediate_life_threats_first",
+      "name": "Rule out immediate life threats before anything else",
+      "activation": "At the start of any chest pain evaluation",
+      "modifier": "Before any further evaluation, explicitly address the five immediate life-threatening diagnoses: STEMI, aortic dissection, tension pneumothorax, massive PE, cardiac tamponade. State whether each has been excluded and on what basis. Only proceed to the broader differential after these are addressed.",
+      "expected_outcome": "The clinician has explicitly considered and documented exclusion of the five immediate life-threatening diagnoses before proceeding."
+    },
+    {
+      "id": "sex_based_presentation",
+      "name": "Adjust for sex-specific presentation patterns",
+      "activation": "When the patient is female",
+      "modifier": "Female patients with ACS more frequently present without classic chest pain — instead with dyspnoea, nausea, jaw pain, or fatigue. Apply sex-appropriate pre-test probability adjustment and note that absence of classic substernal chest pain does not reduce ACS probability in female patients.",
+      "expected_outcome": "The evaluation does not miss an ACS presentation because the classic symptom pattern was absent."
+    },
+    {
+      "id": "bilateral_bp_dissection",
+      "name": "Measure bilateral blood pressure before CT if dissection is possible",
+      "activation": "When aortic dissection is on the differential",
+      "modifier": "Before proceeding to CT angiography, bilateral brachial blood pressure must be documented. A difference >20 mmHg raises dissection probability significantly. If dissection is likely, the contrast protocol differs from a standard CT chest and must be specified.",
+      "expected_outcome": "The clinician has bilateral BP documented and the correct imaging protocol ordered before contrast is given."
+    },
+    {
+      "id": "pre_test_probability_explicit",
+      "name": "Quantify pre-test probability before ordering tests",
+      "activation": "Before ordering troponin, D-dimer, or imaging",
+      "modifier": "Apply a validated risk score (HEART score for ACS, Wells score for PE) and document the score before ordering confirmatory tests. Interpret results in the context of the pre-test probability. A negative D-dimer has different implications in low vs moderate Wells probability.",
+      "expected_outcome": "Test results are interpreted in the correct probabilistic context, not as binary positive/negative."
+    },
+    {
+      "id": "serial_troponin_protocol",
+      "name": "Apply the correct serial troponin protocol",
+      "activation": "When ACS is on the differential and initial troponin is negative",
+      "modifier": "A single negative troponin does not exclude ACS. Apply the appropriate high-sensitivity troponin algorithm for the assay in use (0h/1h, 0h/2h, or 0h/3h depending on assay). Document the assay type, the threshold, and the timing. An initial negative troponin with symptoms onset <3h requires serial measurement.",
+      "expected_outcome": "The clinician uses the correct serial protocol for the specific assay and does not discharge a patient based on a single negative result."
+    },
+    {
+      "id": "pain_free_does_not_exclude",
+      "name": "Pain-free at presentation does not reduce pre-test probability",
+      "activation": "When the patient reports the chest pain has resolved",
+      "modifier": "Resolution of chest pain at the time of evaluation does not reduce the pre-test probability for ACS. Vasospastic angina and unstable angina typically resolve between episodes. Evaluate on the basis of the reported symptom history, not the current presentation.",
+      "expected_outcome": "The evaluation is not prematurely closed because the patient feels better."
+    }
+  ],
+  "conversation_map": [
+    {
+      "step": 1,
+      "name": "Immediate life-threat exclusion",
+      "purpose": "Explicitly address and document exclusion of the five immediate life-threatening diagnoses before any other evaluation.",
+      "model_instruction": "Ask or establish the status of each of the five immediate life threats: STEMI (ECG), aortic dissection (pain character, bilateral BP), tension pneumothorax (breath sounds, O2), massive PE (haemodynamic status, risk factors), cardiac tamponade (JVD, hypotension, muffled sounds). Do not proceed until each is addressed.",
+      "next_step_condition": "All five immediate life threats have been explicitly addressed."
+    },
+    {
+      "step": 2,
+      "name": "Pre-test probability quantification",
+      "purpose": "Establish the quantitative pre-test probability for the leading diagnoses before ordering confirmatory tests.",
+      "model_instruction": "Apply the relevant validated risk score (HEART, Wells PE, Wells DVT as appropriate) using the clinical information available. Document the score and the probability tier. This determines which tests should be ordered and how results should be interpreted.",
+      "next_step_condition": "Pre-test probability is documented for the leading diagnosis."
+    },
+    {
+      "step": 3,
+      "name": "Diagnostic plan with protocol specification",
+      "purpose": "Specify the tests to order and the protocols to apply, in the context of the pre-test probability.",
+      "model_instruction": "Specify the diagnostic tests, the protocols (serial troponin algorithm, CT contrast protocol), and the decision thresholds for each. Interpret each test result relative to the pre-test probability, not as a standalone binary result.",
+      "next_step_condition": null
+    }
+  ],
+  "blind_spots": [
+    {
+      "id": "atypical_presentation_sex",
+      "title": "Atypical presentation is typical in women",
+      "description": "The 'classic' substernal crushing chest pain pattern was derived from predominantly male study populations. Female patients with ACS frequently present atypically. Absence of classic symptoms does not reduce ACS probability in a female patient."
+    },
+    {
+      "id": "single_troponin_clearance",
+      "title": "A single negative troponin does not clear ACS",
+      "description": "Troponin rises over time from symptom onset. A negative result at presentation in a patient with symptoms onset under 3 hours is not an exclusion — it is the baseline point of a required serial measurement."
+    },
+    {
+      "id": "bilateral_bp_omission",
+      "title": "Bilateral blood pressure is consistently omitted",
+      "description": "Aortic dissection is frequently missed because bilateral brachial BP measurement is skipped. A >20 mmHg difference is a major dissection signal and changes the imaging protocol."
+    },
+    {
+      "id": "resolved_pain_false_reassurance",
+      "title": "Pain resolution does not mean low risk",
+      "description": "Vasospastic angina and unstable angina characteristically resolve between episodes. A patient who feels better at the time of evaluation may have had a high-risk event. Pre-test probability is calculated from the reported history, not the current symptom status."
+    },
+    {
+      "id": "wells_score_before_d_dimer",
+      "title": "D-dimer must be interpreted against pre-test probability",
+      "description": "A negative D-dimer excludes PE only in low or intermediate Wells probability. Ordering D-dimer without first documenting the Wells score means the result cannot be correctly interpreted — and a negative result in a high-probability patient is not clinically meaningful."
+    }
+  ],
+  "error_correction_patterns": [
+    {
+      "id": "anchoring_on_cardiac",
+      "error": "Anchoring on ACS and failing to maintain a broad differential that includes dissection and PE.",
+      "detection": "The evaluation proceeds directly to troponin and ECG without explicitly addressing dissection or PE, despite pain character or risk factors that could support either.",
+      "correction": "Return to the immediate life-threat checklist. Address dissection (bilateral BP, pain character) and PE (Wells score, risk factors) before narrowing to ACS."
+    },
+    {
+      "id": "discharging_on_single_negative",
+      "error": "Discharging a patient based on a single negative high-sensitivity troponin.",
+      "detection": "The plan is to discharge after a single troponin result without serial measurement, in a patient with symptom onset under 6 hours.",
+      "correction": "Apply the serial troponin algorithm appropriate for the assay in use. For symptom onset under 3 hours, a minimum 0h/1h or 0h/2h protocol is required depending on the assay."
+    },
+    {
+      "id": "wrong_ct_protocol",
+      "error": "Ordering CT chest without specifying the correct contrast protocol for the differential being evaluated.",
+      "detection": "A CT is ordered for a patient where dissection is possible without specifying an aortic dissection protocol.",
+      "correction": "Specify the protocol by name. If both PE and dissection are on the differential, discuss with radiology whether a triple-rule-out protocol is appropriate for this patient."
+    }
+  ],
+  "unknown_unknowns": [
+    {
+      "label": "On anchoring in early diagnosis —",
+      "content": "The first plausible diagnosis that fits the presenting symptoms tends to suppress consideration of alternatives — even when subsequent data contradicts it. Groopman's analysis of diagnostic error (How Doctors Think, 2007) identifies premature closure as the single most common cognitive failure in diagnosis. In chest pain triage, this most often manifests as anchoring on ACS and failing to maintain the differential for dissection."
+    },
+    {
+      "label": "On feedback loops in clinical expertise —",
+      "content": "Chest pain diagnosis is unusual because some feedback is systematically absent — patients discharged incorrectly who deteriorate at home do not appear in the same clinician's case series. Kahneman and Klein's work on expert intuition identifies this as a low-validity learning environment: the expert cannot learn from errors they never see."
+    },
+    {
+      "label": "On the troponin reference range problem —",
+      "content": "High-sensitivity troponin assays have substantially different 99th percentile thresholds across manufacturers and assay generations. A result that is negative on one assay may be positive on another. Clinical interpretation requires knowing the specific assay, its threshold, and the sex-specific threshold if the assay uses one."
+    },
+    {
+      "label": "On aortic dissection misdiagnosis rates —",
+      "content": "Aortic dissection is misdiagnosed on first presentation in approximately 15-43% of cases (International Registry of Acute Aortic Dissection, IRAD). The most common reason is that the diagnosis was not on the differential. Bilateral BP measurement — a 30-second finding — is the most underused tool in excluding it."
+    },
+    {
+      "label": "On sex-based research exclusion effects —",
+      "content": "The ACS presentation criteria clinicians are trained to recognise were derived from predominantly male study populations. The 'atypical' presentation in women is only atypical relative to a male-derived reference standard; it is entirely typical for a female patient with ACS."
+    }
+  ],
+  "search_tags": {
+    "primary": [
+      "chest pain", "differential diagnosis", "ACS", "acute coronary syndrome",
+      "myocardial infarction", "aortic dissection", "pulmonary embolism",
+      "cardiac triage"
+    ],
+    "secondary": [
+      "STEMI", "NSTEMI", "troponin", "HEART score", "Wells score",
+      "emergency cardiology", "chest pain evaluation", "high-sensitivity troponin",
+      "ECG interpretation", "clinical decision making"
+    ],
+    "contextual": [
+      "emergency medicine", "cardiology", "internal medicine",
+      "attending physicians", "junior doctors", "clinical reasoning"
+    ]
+  }
+}

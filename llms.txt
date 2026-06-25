@@ -1,0 +1,45 @@
+# ALF — Azail Layer Format
+
+ALF (Azail Layer Format) is an open JSON file format for encoding portable, model-neutral expert reasoning layers.
+
+## What ALF is
+
+An .alf file encodes how a domain expert thinks — the evaluative sequences, the things non-experts don't know to ask, the procedural constraints, and pointers to private data that stays on the institution's own infrastructure.
+
+ALF is not a prompt. It is a structured container for cognitive expertise that any conformant platform can read and assemble into context before a query reaches a language model. The same .alf file works with any model.
+
+## The format is open
+
+The specification is published at dotalf.com/spec/v1. No licence is required to implement a reader, writer, or validator, or to write an .alf file. Marketplace layers built on ALF have their own licence terms. The format does not.
+
+## Nine sections
+
+Every conformant .alf file contains exactly nine top-level sections:
+
+1. metadata — layer identity, type, attribution, licence
+2. trigger_conditions — when the layer should activate
+3. required_inputs — what the platform needs before the layer fires
+4. enhancement_templates — named instructions that reshape model responses
+5. conversation_map — multi-turn structured sequences
+6. blind_spots — things the user doesn't know they don't know
+7. error_correction_patterns — common mistakes and how to catch them
+8. unknown_unknowns — insights an expert would surface that a non-expert wouldn't ask for
+9. search_tags — semantic and contextual tags for platform matching
+
+## The open/private boundary
+
+Copying an .alf file copies the structure. It does not copy the verified authorship credential, the live platform metrics, the ongoing refinement, or the private runtime data that data layers point to. The protection is structural, not cryptographic — ALF defines no encryption-at-rest or watermarking mechanism.
+
+## Four layer types
+
+- reasoning — encodes how an expert evaluates a situation
+- procedure — encodes a sequence with a defined correct order
+- context — carries standing facts, precedents, or constraints
+- data — primarily a pointer to an external runtime data source
+
+## Key resources
+
+- Full specification: dotalf.com/spec/v1
+- JSON Schema: dotalf.com/spec/v1/schema.json
+- GitHub: github.com/phihal00/alf-spec
+- Maintained by: Azail AB (azail.ai)
