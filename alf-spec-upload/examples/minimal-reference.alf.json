@@ -1,0 +1,162 @@
+{
+  "metadata": {
+    "alf_version": "1.0",
+    "layer_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "title": "Minimal ALF Reference Layer",
+    "description": "A minimal conformant ALF v1 file for testing reader implementations. Not a quality layer — content is illustrative only.",
+    "domain": "reference",
+    "layer_type": "reasoning",
+    "display_type": "editorial",
+    "attribution_label": "Azail Editorial",
+    "author_handle": null,
+    "created_at": "2026-06-25",
+    "updated_at": "2026-06-25",
+    "language": "en",
+    "licence": "CC BY 4.0"
+  },
+  "trigger_conditions": [
+    {
+      "type": "semantic",
+      "description": "User asks about how to approach a complex problem systematically",
+      "examples": ["How do I think through this?", "What framework should I use?"]
+    },
+    {
+      "type": "semantic",
+      "description": "User asks for expert-level analysis of a situation",
+      "examples": ["How would an expert evaluate this?", "What am I missing?"]
+    }
+  ],
+  "required_inputs": [
+    {
+      "id": "problem_description",
+      "label": "Problem description",
+      "description": "A clear statement of the problem or situation the user wants to analyse.",
+      "source": "user_provided",
+      "required": true
+    },
+    {
+      "id": "domain_context",
+      "label": "Domain context",
+      "description": "The field or context in which the problem exists.",
+      "source": "inferred",
+      "required": false
+    }
+  ],
+  "enhancement_templates": [
+    {
+      "id": "reframe_before_answer",
+      "name": "Reframe before answering",
+      "activation": "When the user presents a problem for analysis",
+      "modifier": "Before answering, identify whether the question as stated is the question that should be answered, or whether a reframe would produce a more useful response.",
+      "expected_outcome": "The user receives a response that addresses the real problem, not just the stated one."
+    },
+    {
+      "id": "surface_second_order",
+      "name": "Surface second-order effects",
+      "activation": "When analysing a decision or course of action",
+      "modifier": "After the primary analysis, identify at least one second-order effect or downstream consequence that a non-expert would not have included in their framing.",
+      "expected_outcome": "The user is aware of consequences they had not considered."
+    },
+    {
+      "id": "name_the_tradeoff",
+      "name": "Name the tradeoff explicitly",
+      "activation": "When two or more options are being compared",
+      "modifier": "State the core tradeoff explicitly as a named tension, not just as a list of pros and cons.",
+      "expected_outcome": "The user understands the fundamental tension at stake, not just the surface features of each option."
+    },
+    {
+      "id": "distinguish_confidence",
+      "name": "Distinguish confidence levels",
+      "activation": "When making claims or recommendations",
+      "modifier": "Distinguish between claims you are confident in, claims that depend on the user's specific situation, and claims that are genuinely uncertain.",
+      "expected_outcome": "The user can calibrate how much to rely on each part of the response."
+    },
+    {
+      "id": "check_for_exceptions",
+      "name": "Check for exceptions",
+      "activation": "When giving general guidance",
+      "modifier": "Identify at least one situation in which the general guidance does not apply, and state the condition that creates the exception.",
+      "expected_outcome": "The user is protected from applying general guidance to a situation that is an exception."
+    }
+  ],
+  "conversation_map": [
+    {
+      "step": 1,
+      "name": "Establish the real question",
+      "purpose": "Confirm that the question being answered is the question that should be answered.",
+      "model_instruction": "Restate the user's question as you understand it. If a reframe would produce a more useful answer, propose it and ask whether to proceed on the original or the reframed question.",
+      "next_step_condition": "The question is confirmed or the reframe is accepted."
+    },
+    {
+      "step": 2,
+      "name": "Deliver the analysis",
+      "purpose": "Provide the substantive response, applying the enhancement templates.",
+      "model_instruction": "Provide the analysis. Apply the enhancement templates for reframing, second-order effects, tradeoff naming, confidence distinction, and exceptions.",
+      "next_step_condition": null
+    }
+  ],
+  "blind_spots": [
+    {
+      "id": "unstated_constraint",
+      "title": "The constraint that was never stated",
+      "description": "Most problem statements omit the constraint that actually matters most, because the person is so inside it they don't see it as a constraint. It is worth asking what cannot change before asking what should."
+    },
+    {
+      "id": "success_definition",
+      "title": "An undefined success condition",
+      "description": "Problems are often analysed without a clear definition of what success looks like. Without this, it is impossible to evaluate whether a proposed solution actually solves the problem."
+    },
+    {
+      "id": "who_else_decides",
+      "title": "Who else has to agree",
+      "description": "Many analyses treat decisions as if one person makes them. In practice, most decisions require the agreement of people who are not in the conversation."
+    }
+  ],
+  "error_correction_patterns": [
+    {
+      "id": "answering_without_reframing",
+      "error": "Answering the stated question without checking whether it is the right question.",
+      "detection": "The response goes directly into analysis or recommendations without acknowledging the structure of the question.",
+      "correction": "Pause before the substantive response. Restate the question. Note any reframe that would produce a more useful answer. Proceed only after the question is confirmed."
+    },
+    {
+      "id": "false_balance",
+      "error": "Presenting options as equally valid when they are not.",
+      "detection": "The response lists pros and cons symmetrically without stating a clear assessment of the relative weight of each consideration.",
+      "correction": "State a clear assessment. Name the tradeoff explicitly. If genuine uncertainty exists, say so and explain what would resolve it."
+    }
+  ],
+  "unknown_unknowns": [
+    {
+      "label": "On the question behind question —",
+      "content": "The question a person asks is rarely the question they need answered. Schon's reflective practitioner research documents that expert performance begins with an immediate reframe of the presenting question before any content-level engagement. A model that answers the stated question without this step produces a technically correct but practically useless response."
+    },
+    {
+      "label": "On high-validity environment limits —",
+      "content": "Expert intuition is reliable only in high-validity environments with rapid, clear feedback. Kahneman and Klein's research establishes this boundary precisely. An expert layer applied outside the environment in which the expertise was developed requires the user to supply a validity test the expert never had to make explicit."
+    },
+    {
+      "label": "On second-order time horizons —",
+      "content": "Most analyses operate on the time horizon of the immediate decision. Second-order effects often manifest on a different time horizon entirely. Failing to specify the evaluation window is the most common reason a correct analysis produces a wrong outcome."
+    },
+    {
+      "label": "On survivorship bias in practice —",
+      "content": "The methods practitioners describe are the ones that worked for the cases they remember. Failures that would have revealed the method's limits are not in the sample. This is documented across disciplines — from Kahneman's work on expert judgment to Taleb's analysis of hidden evidence in financial markets."
+    }
+  ],
+  "search_tags": {
+    "primary": [
+      "problem solving", "structured thinking", "decision analysis",
+      "expert reasoning", "critical thinking", "analytical framework",
+      "problem framing", "decision making"
+    ],
+    "secondary": [
+      "tradeoff analysis", "second-order effects", "reframing",
+      "cognitive bias", "uncertainty", "constraint identification"
+    ],
+    "contextual": [
+      "complex problems", "strategic decisions",
+      "knowledge workers", "consultants", "analysts"
+    ]
+  }
+}
