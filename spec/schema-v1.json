@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://dotalf.com/spec/v1/schema.json",
   "title": "ALF v1 — Azail Layer Format",
-  "description": "JSON Schema for ALF v1 conformance validation.",
+  "description": "JSON Schema for ALF v1 conformance validation. Covers v1.0 and v1.1.",
   "type": "object",
   "required": ["metadata", "trigger_conditions", "required_inputs", "enhancement_templates", "conversation_map", "blind_spots", "error_correction_patterns", "unknown_unknowns", "search_tags"],
   "additionalProperties": true,
@@ -24,7 +24,31 @@
         "created_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
         "updated_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
         "language": { "type": "string" },
-        "licence": { "type": "string" }
+        "licence": { "type": "string" },
+        "distribution_scope": {
+          "type": "string",
+          "enum": ["public", "org", "private"],
+          "description": "v1.1 (DR-598). Declared distribution boundary. Default: public. Enforced by the platform."
+        },
+        "issuer_org_id": {
+          "type": ["string", "null"],
+          "description": "v1.1 (DR-599). UUID v4 or verified domain string identifying the owning enterprise tenant. Required (non-null) when distribution_scope is org."
+        },
+        "content_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "description": "v1.1 (DR-600). Semver string tracking version of the layer's intellectual content, independent of alf_version."
+        }
+      },
+      "if": {
+        "properties": { "distribution_scope": { "const": "org" } },
+        "required": ["distribution_scope"]
+      },
+      "then": {
+        "required": ["issuer_org_id"],
+        "properties": {
+          "issuer_org_id": { "not": { "type": "null" } }
+        }
       }
     },
     "trigger_conditions": {
@@ -51,7 +75,18 @@
           "label": { "type": "string", "maxLength": 60 },
           "description": { "type": "string", "maxLength": 200 },
           "source": { "type": "string", "enum": ["user_provided", "inferred", "profile", "runtime"] },
-          "required": { "type": "boolean" }
+          "required": { "type": "boolean" },
+          "pointer_config": {
+            "type": "object",
+            "description": "v1.1 (DR-601). Optional. Only valid when source is runtime.",
+            "required": ["endpoint", "auth_scheme", "cache_allowed"],
+            "additionalProperties": false,
+            "properties": {
+              "endpoint": { "type": "string", "maxLength": 500 },
+              "auth_scheme": { "type": "string", "enum": ["bearer", "api_key", "mtls", "none"] },
+              "cache_allowed": { "type": "boolean" }
+            }
+          }
         }
       }
     },
@@ -132,6 +167,17 @@
         "primary": { "type": "array", "minItems": 8, "items": { "type": "string", "maxLength": 60 } },
         "secondary": { "type": "array", "minItems": 6, "items": { "type": "string", "maxLength": 60 } },
         "contextual": { "type": "array", "minItems": 5, "items": { "type": "string", "maxLength": 60 } }
+      }
+    },
+    "audit_requirements": {
+      "type": "object",
+      "description": "v1.1 (DR-602). Optional. Signals platform audit obligations. Informational only — does not create binding legal obligations from within the file.",
+      "additionalProperties": false,
+      "properties": {
+        "log_layer_invocations": { "type": "boolean" },
+        "log_template_ids_fired": { "type": "boolean" },
+        "log_pointer_fetches": { "type": "boolean" },
+        "platform_obligations_note": { "type": "string", "maxLength": 500 }
       }
     }
   }

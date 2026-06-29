@@ -1,26 +1,33 @@
-# Changelog
+# ALF Specification Changelog
 
-All notable changes to the ALF specification are documented here.
+## v1.1.0-draft (2026-06-26)
 
-Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
-Versioning follows [Semantic Versioning](https://semver.org/).
-
----
-
-## [1.0.0-draft] — 2026-06-25
+Enterprise readiness additions. All changes are optional fields — full backwards compatibility with v1.0 files maintained.
 
 ### Added
-- Initial draft specification for ALF v1
-- Nine-section JSON structure: metadata, trigger_conditions, required_inputs, enhancement_templates, conversation_map, blind_spots, error_correction_patterns, unknown_unknowns, search_tags
-- Four layer types: reasoning, procedure, context, data
-- Four display types: expert, editorial, institutional, community
-- Conformance criteria for files and readers
-- JSON Schema (spec/schema-v1.json)
-- Minimal reference example (examples/minimal-reference.alf.json)
-- Benchmark quality example: Clinical Differential Reasoning for chest pain triage (examples/clinical-differential-reasoning.alf.json)
-- llms.txt for AI assistant discoverability
-- Community contribution process (community-layers/)
+
+- `metadata.distribution_scope` (enum: `public` | `org` | `private`, default `public`) — DR-598
+- `metadata.issuer_org_id` (string|null) — machine-readable enterprise tenant identifier — DR-599
+- `metadata.content_version` (semver string) — tracks intellectual content version independently of format version — DR-600
+- `required_inputs[].pointer_config` object for `source: runtime` inputs — fields: `endpoint`, `auth_scheme`, `cache_allowed` — DR-601
+- `audit_requirements` top-level optional section — fields: `log_layer_invocations`, `log_template_ids_fired`, `log_pointer_fetches`, `platform_obligations_note` — DR-602
+- Conformance rule: platform must honour `distribution_scope`; `org`-scoped layers require non-null `issuer_org_id`
+- Conformance rule: platform must treat data fetched with `cache_allowed: false` as strictly ephemeral
+- `alf_version` pattern now accepts `"1.1"` in addition to `"1.0"`
+
+### Changed
+
+- §14 (Conformance) updated with two new platform conformance requirements
+- §15 (Open/private boundary) updated to reflect v1.1 metadata additions
+- §16 (Versioning) updated with content versioning guidance and v1.1 changelog note
+- Table of contents updated to include §13 (audit_requirements)
+
+### Not changed
+
+All nine required sections and their minimum/maximum counts are unchanged. v1.0 files remain fully conformant.
 
 ---
 
-*ALF is maintained by Azail AB. Canonical home: dotalf.com*
+## v1.0.0-draft (2026-06-25)
+
+Initial draft of the ALF v1 specification.
